@@ -1,19 +1,5 @@
-// Learn cc.Class:
-//  - [Chinese] http://www.cocos.com/docs/creator/scripting/class.html
-//  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/class/index.html
-// Learn Attribute:
-//  - [Chinese] http://www.cocos.com/docs/creator/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/reference/attributes/index.html
-// Learn life-cycle callbacks:
-//  - [Chinese] http://www.cocos.com/docs/creator/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/life-cycle-callbacks/index.html
-
-// 定义了一个类, new 构造函数模拟;
-// extends: 扩展自 component;
-// new 类， 实例化一个组件类， 往对应的节点上添加我们的组件,new出来来组件实例;
 cc.Class({
     extends: cc.Component,
-
     // 属性列表，它将会作为组件实例的数据成员，到组件里面,绑定到我们的编辑器上;
     properties: {
         // foo: {
@@ -32,7 +18,7 @@ cc.Class({
         //     }
         // },
 
-        player: {
+        player1: {
             default: null,
             type: cc.Node
         }
@@ -46,6 +32,10 @@ cc.Class({
 
 
     start () {
+        var setBallPos = (x, y) => {
+            this.node.x=x;
+            this.node.y=y;
+        }
         if(G.stand==1){
             // let colli=this.getComponent(cc.PhysicsCircleCollider);
 
@@ -54,12 +44,14 @@ cc.Class({
             /**
              * 监听足球位置
              */
-            var setBallPos = (x, y) => {
+            var setBallPos = (x, y, v) => {
                 this.node.x=x;
                 this.node.y=y;
+                this.body = this.getComponent(cc.RigidBody);
+                this.body.linearVelocity= cc.v2((-1)*v.x, (-1)*v.y);
             }
-            G.roomSocket.on('update ball position', function(msg){
-                setBallPos((-1)*msg.position.x, (-1)*msg.position.y);
+            G.ballSocket.on('update ball position', function(msg){
+                setBallPos((-1)*msg.position.x, (-1)*msg.position.y, msg.position.v);
             });
         }
     },
@@ -70,9 +62,9 @@ cc.Class({
         /**
          * 发送足球位置
          */
-        if(G.stand==1){
-            G.roomSocket.emit('update ball position', {position: {x:this.node.x, y:this.node.y}});
-        }
+        // if(G.stand==1){
+        //     G.ballSocket.emit('update ball position', {position: {x:this.node.x, y:this.node.y}});
+        // }
     },
     
 
@@ -82,21 +74,22 @@ cc.Class({
             var worldManifold = contact.getWorldManifold();
             var points = worldManifold.points;
             var normal = worldManifold.normal;
-
-            //获取到两个碰撞体相互碰撞时在碰撞点上的相对速度
-            var vel1 = this.getComponent(cc.RigidBody).getLinearVelocityFromWorldPoint( worldManifold.points[0] );
-            var vel2 = this.player.getComponent(cc.RigidBody).getLinearVelocityFromWorldPoint( worldManifold.points[0] );
-            var relativeVelocity = vel1.sub(vel2);
-
             this.body = this.getComponent(cc.RigidBody);
+
             if(otherCollider.node.groupIndex == 3){
                 //console.log("otherCollider.group=='player'");
                 this.body.applyLinearImpulse(cc.p(-normal.x*80, -normal.y*80), points[0], true);
             }
-            
+            if(G.stand==1){
+                
+                let v = this.body.linearVelocity;
+
+                console.log("vx: "+ v.x); 
+                G.ballSocket.emit('update ball position', {position: {x:this.node.x, y:this.node.y, v:this.body.linearVelocity}});
+            }
             // cc.log("normal "+normal);
             // cc.log("relativeVelocity "+relativeVelocity+" "+relativeVelocity.x+" "+relativeVelocity.y);
-            // cc.log("检测到碰撞");            
+            // cc.log("检测到碰撞");
         }
     },
 

@@ -59,6 +59,7 @@ cc.Class({
             G.roomId=roomId;
             //G.roomSocket = io.connect('http://119.23.224.88:5051/rooms' + G.roomId, {'force new connection': true});//instantiate a new connection
             G.roomSocket = io('http://119.23.224.88:5051/rooms' + G.roomId); //redirect the same connection
+            G.ballSocket = io('http://119.23.224.88:5051/rooms' + G.roomId, {'force new connection': true});
             //G.queueSocket.disconnect();//if this line is removed, need to do people -- at somewhere else
             cc.director.loadScene('game');
         });

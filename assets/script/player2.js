@@ -60,13 +60,13 @@ cc.Class({
         // 更新对手位置
         G.roomSocket.on('update player position', function(msg){
             if(msg.stand!=G.stand){
-                if(G.stand==1){//不对称
-                    setPlayer2Pos((-1)*msg.position.x, (-1)*msg.position.y);
-                }
-                else{
-                    setPlayer2Pos((-1)*msg.position.x, (-1)*msg.position.y);
-                }
-                
+                // if(G.stand==1){//不对称
+                //     setPlayer2Pos((-1)*msg.position.x, (-1)*msg.position.y);
+                // }
+                // else{
+                //     setPlayer2Pos((-1)*msg.position.x, (-1)*msg.position.y);
+                // }
+                setPlayer2Pos((-1)*msg.position.x, (-1)*msg.position.y);
             }
         });
     },

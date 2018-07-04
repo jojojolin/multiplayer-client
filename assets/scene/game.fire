@@ -900,7 +900,7 @@
       "__id__": 21
     },
     "_enabled": true,
-    "player": {
+    "player1": {
       "__id__": 26
     }
   },
@@ -1275,7 +1275,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 97.87,
+      "width": 98,
       "height": 40
     },
     "_rotationX": 0,
